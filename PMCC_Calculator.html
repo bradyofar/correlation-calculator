@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMCC and P-Value Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f1623c;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #f1623c;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .instruction-text {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+            display: block;
+            width: 100%;
+        }
+
+        .spreadsheet-input {
+            display: block;
+            width: 80%;
+            max-width: 1000px;
+            height: 150px;
+            border: 1px solid #dcdcdc;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            white-space: pre;
+            overflow: auto;
+            background-color: #fafafa;
+            caret-color: black;
+            outline: none;
+            margin: 0 auto 15px auto;
+        }
+
+        .spreadsheet-input::placeholder {
+            color: #888;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #f1623c;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #d94d1a;
+            transform: translateY(-2px);
+        }
+
+        .results {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .significant {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .not-significant {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-container canvas {
+            display: block;
+            max-width: 100%;
+        }
+
+        .spiel {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PMCC and P-Value Calculator</h1>
+        <p class="intro-text">
+            Enter two sets of data below to calculate the Pearson Correlation Coefficient and p-value. Visualise the data with a scatter plot and line of best fit.
+        </p>
+
+        <div class="input-section">
+            <h3>Input Data</h3>
+            <span class="instruction-text">Paste your data directly from a Google Sheet, including headers in the first row. The headers will be used as axis labels.</span>
+            <textarea id="dataInput" class="spreadsheet-input" placeholder="Paste data here..." rows="6"></textarea>
+            <div class="button-container">
+                <button onclick="calculatePMCC()">Calculate PMCC and P-Value</button>
+                <div id="results" class="results"></div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 id="chartTitle" style="text-align: center; margin-bottom: 10px;">Scatter Plot with Line of Best Fit</h3>
+            <canvas id="scatterChart"></canvas>
+        </div>
+
+        <div id="spiel" class="spiel"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jstat/dist/jstat.min.js"></script>
+
+    <script>
+        function cleanData(input) {
+            // Split input by lines and then by tabs or spaces
+            const rows = input.trim().split('\n').map(row => row.split(/\t|\s{2,}/));
+
+            // Extract headers from the first row
+            const headers = rows[0];
+
+            // Extract data ignoring the first row (headers)
+            const data = rows.slice(1).map(row =>
+                row.map(val => parseFloat(val.replace(/[^\d.-]/g, '')) || NaN)
+            );
+
+            // Separate Metric 1 and Metric 2 while filtering out any invalid numbers
+            const metric1 = data.map(row => row[0]).filter(val => !isNaN(val));
+            const metric2 = data.map(row => row[1]).filter(val => !isNaN(val));
+
+            return { headers, metric1, metric2 };
+        }
+
+        function calculatePMCC() {
+            // Clean and parse the values from the text area
+            const { headers, metric1, metric2 } = cleanData(document.getElementById('dataInput').value);
+
+            // Check if both metrics have the same length
+            if (metric1.length !== metric2.length || metric1.length === 0) {
+                document.getElementById('results').innerHTML = '<p class="error">Please ensure both metrics have the same number of values and are not empty.</p>';
+                return;
+            }
+
+            // Calculate PMCC
+            const pmcc = jStat.corrcoeff(metric1, metric2);
+
+            // Calculate p-value using t-test
+            const n = metric1.length;
+            const tStatistic = pmcc * Math.sqrt((n - 2) / (1 - Math.pow(pmcc, 2)));
+            const pValue = 2 * (1 - jStat.studentt.cdf(Math.abs(tStatistic), n - 2));
+
+            // Determine significance (alpha = 0.05)
+            const isSignificant = pValue < 0.05;
+
+            // Display results with p-value up to 10 decimal places
+            document.getElementById('results').innerHTML = `
+                <p class="result-label ${isSignificant ? 'significant' : 'not-significant'}">
+                    PMCC: ${pmcc.toFixed(4)}<br>
+                    P-Value: ${pValue.toFixed(10)} (${isSignificant ? 'Significant' : 'Not Significant'})
+                </p>
+            `;
+
+            // Render scatter plot with line of best fit
+            renderScatterPlot(metric1, metric2, pmcc, headers[0], headers[1]);
+
+            // Display the spiel about the correlation
+            displaySpiel(headers[0], headers[1], pmcc, isSignificant);
+        }
+
+        function renderScatterPlot(metric1, metric2, pmcc, xAxisLabel, yAxisLabel) {
+            const ctx = document.getElementById('scatterChart').getContext('2d');
+
+            // Prepare data for scatter plot
+            const scatterData = metric1.map((x, i) => ({ x, y: metric2[i] }));
+
+            // Calculate line of best fit
+            const { slope, intercept } = calculateLineOfBestFit(metric1, metric2);
+
+            // Destroy previous chart instance if it exists
+            if (window.scatterChartInstance) {
+                window.scatterChartInstance.destroy();
+            }
+
+            // Create new scatter plot
+            window.scatterChartInstance = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Data Points',
+                            data: scatterData,
+                            backgroundColor: '#f1623c'
+                        },
+                        {
+                            type: 'line',
+                            label: 'Line of Best Fit',
+                            data: scatterData.map(point => ({
+                                x: point.x,
+                                y: slope * point.x + intercept
+                            })),
+                            borderColor: '#d94d1a',
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: xAxisLabel
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: yAxisLabel
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function calculateLineOfBestFit(xValues, yValues) {
+            const xMean = jStat.mean(xValues);
+            const yMean = jStat.mean(yValues);
+            const slope = jStat.covariance(xValues, yValues) / jStat.variance(xValues);
+            const intercept = yMean - slope * xMean;
+            return { slope, intercept };
+        }
+
+        function displaySpiel(variable1, variable2, pmcc, isSignificant) {
+            const spielElement = document.getElementById('spiel');
+            let significanceText = isSignificant
+                ? "statistically significant"
+                : "not statistically significant";
+
+            spielElement.innerHTML = `The correlation between <strong>${variable1}</strong> and <strong>${variable2}</strong> has a Pearson correlation coefficient (PMCC) of ${pmcc.toFixed(4)}. This indicates a ${significanceText} relationship between the two variables based on the data provided.`;
+        }
+    </script>
+</body>
+</html>
