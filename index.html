@@ -123,6 +123,7 @@
         }
 
         .chart-container {
+            display: none; /* Hide initially */
             width: 100%;
             max-width: 800px;
             margin: 40px auto;
@@ -169,7 +170,7 @@
             </div>
         </div>
 
-        <div class="chart-container">
+        <div id="chartContainer" class="chart-container">
             <h3 id="chartTitle" style="text-align: center; margin-bottom: 10px;">Scatter Plot with Line of Best Fit</h3>
             <canvas id="scatterChart"></canvas>
         </div>
@@ -225,15 +226,18 @@
             document.getElementById('results').innerHTML = `
                 <p class="result-label ${isSignificant ? 'significant' : 'not-significant'}">
                     PMCC: ${pmcc.toFixed(4)}<br>
-                    P-Value: ${pValue.toFixed(10)} (${isSignificant ? 'Significant' : 'Not Significant'})
+                    P-Value: ${pValue.toFixed(5)} (${isSignificant ? 'Significant' : 'Not Significant'})
                 </p>
             `;
+
+            // Show the chart container
+            document.getElementById('chartContainer').style.display = 'block';
 
             // Render scatter plot with line of best fit
             renderScatterPlot(metric1, metric2, pmcc, headers[0], headers[1]);
 
             // Display the spiel about the correlation
-            displaySpiel(headers[0], headers[1], pmcc, isSignificant);
+            displaySpiel(headers[0], headers[1], pmcc, pValue, isSignificant);
         }
 
         function renderScatterPlot(metric1, metric2, pmcc, xAxisLabel, yAxisLabel) {
@@ -301,13 +305,16 @@
             return { slope, intercept };
         }
 
-        function displaySpiel(variable1, variable2, pmcc, isSignificant) {
+        function displaySpiel(variable1, variable2, pmcc, pValue, isSignificant) {
             const spielElement = document.getElementById('spiel');
-            let significanceText = isSignificant
-                ? "statistically significant"
-                : "not statistically significant";
+            const roundedPValue = pValue.toFixed(5); // Round p-value to 5 decimal places
+            const significanceText = isSignificant
+                ? `The p-value of ${roundedPValue} indicates a statistically significant relationship between the two variables based on the data provided.`
+                : `The p-value of ${roundedPValue} indicates a not statistically significant relationship between the two variables based on the data provided.`;
 
-            spielElement.innerHTML = `The correlation between <strong>${variable1}</strong> and <strong>${variable2}</strong> has a Pearson correlation coefficient (PMCC) of ${pmcc.toFixed(4)}. This indicates a ${significanceText} relationship between the two variables based on the data provided.`;
+            spielElement.innerHTML = `
+                The correlation between <strong>${variable1}</strong> and <strong>${variable2}</strong> has a Pearson correlation coefficient (PMCC) of ${pmcc.toFixed(4)}. ${significanceText}
+            `;
         }
     </script>
 </body>
