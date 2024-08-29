@@ -42,6 +42,15 @@
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
         }
 
+        .intro-text {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center; /* Center the text */
+            display: block;
+            width: 100%;
+        }
+
         .instruction-text {
             font-size: 18px;
             color: #333;
@@ -222,7 +231,7 @@
             // Determine significance (alpha = 0.05)
             const isSignificant = pValue < 0.05;
 
-            // Display results with p-value up to 10 decimal places
+            // Display results with p-value up to 5 decimal places
             document.getElementById('results').innerHTML = `
                 <p class="result-label ${isSignificant ? 'significant' : 'not-significant'}">
                     PMCC: ${pmcc.toFixed(4)}<br>
