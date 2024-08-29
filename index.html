@@ -191,24 +191,30 @@
     <script src="https://cdn.jsdelivr.net/npm/jstat/dist/jstat.min.js"></script>
 
     <script>
-        function cleanData(input) {
-            // Split input by lines and then by tabs or spaces
-            const rows = input.trim().split('\n').map(row => row.split(/\t|\s{2,}/));
+ function cleanData(input) {
+    // Split input by lines and then by tabs or spaces
+    const rows = input.trim().split('\n').map(row => row.split(/\t|\s{2,}/));
 
-            // Extract headers from the first row
-            const headers = rows[0];
+    // Extract headers from the first row
+    const headers = rows[0];
 
-            // Extract data ignoring the first row (headers)
-            const data = rows.slice(1).map(row =>
-                row.map(val => parseFloat(val.replace(/[^\d.-]/g, '')) || NaN)
-            );
+    // Extract data ignoring the first row (headers)
+    const data = rows.slice(1).map(row =>
+        row.map(val => parseFloat(val.replace(/[^\d.-]/g, '')) || NaN)
+    );
 
-            // Separate Metric 1 and Metric 2 while filtering out any invalid numbers
-            const metric1 = data.map(row => row[0]).filter(val => !isNaN(val));
-            const metric2 = data.map(row => row[1]).filter(val => !isNaN(val));
+    // Separate Metric 1 and Metric 2 while filtering out any invalid or negative numbers
+    const metric1 = data.map(row => row[0]).filter(val => !isNaN(val) && val >= 0);
+    const metric2 = data.map(row => row[1]).filter(val => !isNaN(val) && val >= 0);
 
-            return { headers, metric1, metric2 };
-        }
+    // Ensure both metrics have the same length
+    const minLength = Math.min(metric1.length, metric2.length);
+    const filteredMetric1 = metric1.slice(0, minLength);
+    const filteredMetric2 = metric2.slice(0, minLength);
+
+    return { headers, metric1: filteredMetric1, metric2: filteredMetric2 };
+}
+
 
         function calculatePMCC() {
             // Clean and parse the values from the text area
