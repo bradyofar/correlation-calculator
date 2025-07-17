@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Correlation Calculator</title>
+<title>Advanced PMCC and Statistical Analysis Calculator</title>
 <style>
 :root {
     --primary-color: #f1623c;
@@ -169,6 +169,11 @@ button:focus-visible {
 .chart-container canvas {
     display: block;
     max-width: 100%;
+    height: 400px !important; /* Added explicit height */
+}
+
+canvas {
+    height: 400px !important; /* Added explicit height for all canvas elements */
 }
 
 .spiel {
@@ -292,7 +297,7 @@ button:focus-visible {
 </head>
 <body>
 <div class="container">
-<h1>Correlation Calculator</h1>
+<h1>Advanced PMCC and Statistical Analysis Calculator</h1>
 <p class="intro-text text-center">
     Enter two sets of data below to calculate the Pearson Correlation Coefficient, p-value, and other advanced statistics. Visualize the data with scatter plots and regression analysis.
 </p>
@@ -355,8 +360,10 @@ function debounce(func, wait) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded');
     const calculateBtn = $('calculateBtn');
     calculateBtn.addEventListener('click', debounce(calculatePMCC, 300));
+    console.log('Event listener attached to calculate button');
     
     // Set up tab switching
     const tabs = document.querySelectorAll('.tab');
@@ -379,6 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function cleanData(input) {
+    console.log('Cleaning data...');
     // Split input by lines and then by tabs or multiple spaces
     const rows = input.trim().split('\n').map(row => row.split(/\t|\s{2,}/));
 
@@ -405,10 +413,12 @@ function cleanData(input) {
         }
     }
 
+    console.log(Processed data: ${metric1.length} valid data points);
     return { headers, metric1, metric2 };
 }
 
 function calculateAdvancedStatistics(xValues, yValues) {
+    console.log('Calculating advanced statistics...');
     const n = xValues.length;
     
     // Calculate means
@@ -470,6 +480,7 @@ function calculateAdvancedStatistics(xValues, yValues) {
     // Test normality of residuals using skewness and kurtosis
     const residualNormality = testResidualNormality(residuals);
     
+    console.log('Statistics calculated successfully');
     return {
         pmcc,
         rSquared,
@@ -525,18 +536,20 @@ function testResidualNormality(residuals) {
 }
 
 function calculatePMCC() {
-    // Clean and parse the values from the text area
-    const { headers, metric1, metric2 } = cleanData($('dataInput').value);
-
-    // Check if both metrics have values
-    if (metric1.length !== metric2.length || metric1.length === 0) {
-        $('results').innerHTML = '<p class="error">Please ensure both metrics have the same number of valid values and are not empty.</p>';
-        $('analysisContainer').style.display = 'none';
-        $('spiel').innerHTML = '';
-        return;
-    }
-
+    console.log('PMCC calculation triggered');
+    
     try {
+        // Clean and parse the values from the text area
+        const { headers, metric1, metric2 } = cleanData($('dataInput').value);
+
+        // Check if both metrics have values
+        if (metric1.length !== metric2.length || metric1.length === 0) {
+            $('results').innerHTML = '<p class="error">Please ensure both metrics have the same number of valid values and are not empty.</p>';
+            $('analysisContainer').style.display = 'none';
+            $('spiel').innerHTML = '';
+            return;
+        }
+
         // Calculate advanced statistics
         const stats = calculateAdvancedStatistics(metric1, metric2);
         
@@ -548,19 +561,21 @@ function calculatePMCC() {
         // Determine significance (alpha = 0.05)
         const isSignificant = pValue < 0.05;
 
+        console.log('Displaying results...');
         // Display results with advanced statistics
-        $('results').innerHTML = `
+        $('results').innerHTML = 
             <p class="result-label ${isSignificant ? 'significant' : 'not-significant'}">
                 PMCC: ${stats.pmcc.toFixed(4)} (95% CI: ${stats.confidenceInterval.lower.toFixed(4)} to ${stats.confidenceInterval.upper.toFixed(4)})<br>
                 P-Value: ${pValue.toFixed(5)} (${isSignificant ? 'Significant' : 'Not Significant'})<br>
                 R²: ${stats.rSquared.toFixed(4)}<br>
                 RMSE: ${stats.rmse.toFixed(4)}
             </p>
-        `;
+        ;
 
         // Show the analysis container
         $('analysisContainer').style.display = 'block';
 
+        console.log('Rendering charts...');
         // Render scatter plot with line of best fit
         renderScatterPlot(metric1, metric2, stats, headers[0] || 'X', headers[1] || 'Y');
 
@@ -573,8 +588,10 @@ function calculatePMCC() {
         // Display the advanced statistical interpretation
         displayAdvancedInterpretation(headers[0] || 'X', headers[1] || 'Y', stats, pValue, isSignificant);
         
+        console.log('All calculations and rendering complete');
     } catch (error) {
-        $('results').innerHTML = `<p class="error">Error calculating results: ${error.message}</p>`;
+        console.error('Error in calculation:', error);
+        $('results').innerHTML = <p class="error">Error calculating results: ${error.message}</p>;
         $('analysisContainer').style.display = 'none';
         $('spiel').innerHTML = '';
     }
@@ -589,7 +606,30 @@ function getPointStyle(point) {
     };
 }
 
+// Helper function to generate best fit line points
+function generateBestFitLine(xValues, slope, intercept) {
+    console.log('Generating best fit line...');
+    // Find min and max x values to draw the line across the full width
+    const minX = Math.min(...xValues);
+    const maxX = Math.max(...xValues);
+    
+    // Return points for the line
+    return [
+        { x: minX, y: slope * minX + intercept },
+        { x: maxX, y: slope * maxX + intercept }
+    ];
+}
+
+function calculateLineOfBestFit(xValues, yValues) {
+    const xMean = jStat.mean(xValues);
+    const yMean = jStat.mean(yValues);
+    const slope = jStat.covariance(xValues, yValues) / jStat.variance(xValues);
+    const intercept = yMean - slope * xMean;
+    return { slope, intercept };
+}
+
 function renderScatterPlot(xValues, yValues, stats, xAxisLabel, yAxisLabel) {
+    console.log('Rendering scatter plot...');
     const ctx = $('scatterChart').getContext('2d');
 
     // Prepare data for scatter plot
@@ -655,7 +695,7 @@ function renderScatterPlot(xValues, yValues, stats, xAxisLabel, yAxisLabel) {
                         callbacks: {
                             label: function(context) {
                                 const point = scatterData[context.dataIndex];
-                                let label = `${xAxisLabel}: ${context.parsed.x.toFixed(2)}, ${yAxisLabel}: ${context.parsed.y.toFixed(2)}`;
+                                let label = ${xAxisLabel}: ${context.parsed.x.toFixed(2)}, ${yAxisLabel}: ${context.parsed.y.toFixed(2)};
                                 if (point && point.isOutlier) {
                                     label += ' (Potential Outlier)';
                                 }
@@ -690,6 +730,7 @@ function renderScatterPlot(xValues, yValues, stats, xAxisLabel, yAxisLabel) {
 }
 
 function renderResidualPlot(predictedValues, residuals) {
+    console.log('Rendering residual plot...');
     const ctx = $('residualChart').getContext('2d');
     
     const datasets = [{
@@ -745,7 +786,7 @@ function renderResidualPlot(predictedValues, residuals) {
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return `Predicted: ${context.parsed.x.toFixed(2)}, Residual: ${context.parsed.y.toFixed(2)}`;
+                                return Predicted: ${context.parsed.x.toFixed(2)}, Residual: ${context.parsed.y.toFixed(2)};
                             }
                         }
                     }
@@ -756,11 +797,12 @@ function renderResidualPlot(predictedValues, residuals) {
 }
 
 function displayAdvancedStats(stats, xLabel, yLabel, pValue, isSignificant) {
+    console.log('Displaying advanced stats...');
     const statsElement = $('advancedStats');
     
     let outlierHtml = '';
     if (stats.outliers.length > 0) {
-        outlierHtml = `
+        outlierHtml = 
             <h4>Potential Outliers</h4>
             <table class="outlier-table">
                 <thead>
@@ -772,150 +814,131 @@ function displayAdvancedStats(stats, xLabel, yLabel, pValue, isSignificant) {
                     </tr>
                 </thead>
                 <tbody>
-                    ${stats.outliers.map(o => `
+                    ${stats.outliers.map(o => 
                         <tr>
                             <td>${o.x.toFixed(2)}</td>
                             <td>${o.y.toFixed(2)}</td>
                             <td>${o.residual.toFixed(2)}</td>
                             <td>${o.standardized.toFixed(2)}</td>
                         </tr>
-                    `).join('')}
+                    ).join('')}
                 </tbody>
             </table>
-        `;
+        ;
     }
     
-    statsElement.innerHTML = `
+    statsElement.innerHTML = 
         <div class="stat-grid">
             <div class="stat-box">
                 <div class="stat-label">Correlation (PMCC)</div>
                 <div class="stat-value">${stats.pmcc.toFixed(4)}</div>
             </div>
-            <div class="stat-box">
-                <div class="stat-label">P-Value</div>
-                <div class="stat-value">${pValue.toFixed(5)}</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">R² (Coefficient of Determination)</div>
-                <div class="stat-value">${stats.rSquared.toFixed(4)}</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Sample Size</div>
-                <div class="stat-value">${stats.n}</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Slope</div>
-                <div class="stat-value">${stats.slope.toFixed(4)}</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Intercept</div>
-                <div class="stat-value">${stats.intercept.toFixed(4)}</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Mean Squared Error (MSE)</div>
-                <div class="stat-value">${stats.mse.toFixed(4)}</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Root Mean Squared Error (RMSE)</div>
-                <div class="stat-value">${stats.rmse.toFixed(4)}</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Standard Error</div>
-                <div class="stat-value">${stats.standardError.toFixed(4)}</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">95% CI for Correlation</div>
-                <div class="stat-value">[${stats.confidenceInterval.lower.toFixed(4)}, ${stats.confidenceInterval.upper.toFixed(4)}]</div>
-            </div>
-        </div>
-        
-        <div class="interpretation-section">
-            <h4>Regression Equation</h4>
-            <p>${yLabel} = ${stats.slope.toFixed(4)} × ${xLabel} ${stats.intercept >= 0 ? '+' : ''} ${stats.intercept.toFixed(  <p>${yLabel} = ${stats.slope.toFixed(4)} × ${xLabel} ${stats.intercept >= 0 ? '+' : ''} ${stats.intercept.toFixed(4)}</p>
-            
-            <h4>Relationship Direction</h4>
-            <p>${stats.pmcc < 0 ? 
-                `As ${xLabel} increases, ${yLabel} tends to decrease (negative correlation).` : 
-                `As ${xLabel} increases, ${yLabel} tends to increase (positive correlation).`
-            }</p>
-            
-            <h4>Residual Analysis</h4>
-            <p>${stats.residualNormality.interpretation}</p>
-            <p>Skewness: ${stats.residualNormality.skewness.toFixed(4)}, Kurtosis: ${stats.residualNormality.kurtosis.toFixed(4)}</p>
-        </div>
-        
-        ${outlierHtml}
-    `;
-}
+         <div class="stat-box">
+                 <div class="stat-label">P-Value</div>
+                 <div class="stat-value">${pValue.toFixed(5)}</div>
+             </div>
+             <div class="stat-box">
+                 <div class="stat-label">R² (Coefficient of Determination)</div>
+                 <div class="stat-value">${stats.rSquared.toFixed(4)}</div>
+             </div>
+             <div class="stat-box">
+                 <div class="stat-label">Sample Size</div>
+                 <div class="stat-value">${stats.n}</div>
+             </div>
+             <div class="stat-box">
+                 <div class="stat-label">Slope</div>
+                 <div class="stat-value">${stats.slope.toFixed(4)}</div>
+             </div>
+             <div class="stat-box">
+                 <div class="stat-label">Intercept</div>
+                 <div class="stat-value">${stats.intercept.toFixed(4)}</div>
+             </div>
+             <div class="stat-box">
+                 <div class="stat-label">Mean Squared Error (MSE)</div>
+                 <div class="stat-value">${stats.mse.toFixed(4)}</div>
+             </div>
+             <div class="stat-box">
+                 <div class="stat-label">Root Mean Squared Error (RMSE)</div>
+                 <div class="stat-value">${stats.rmse.toFixed(4)}</div>
+             </div>
+             <div class="stat-box">
+                 <div class="stat-label">Standard Error</div>
+                 <div class="stat-value">${stats.standardError.toFixed(4)}</div>
+             </div>
+             <div class="stat-box">
+                 <div class="stat-label">95% CI for Correlation</div>
+                 <div class="stat-value">[${stats.confidenceInterval.lower.toFixed(4)}, ${stats.confidenceInterval.upper.toFixed(4)}]</div>
+             </div>
+         </div>
+         
+         <div class="interpretation-section">
+             <h4>Regression Equation</h4>
+             <p>${yLabel} = ${stats.slope.toFixed(4)} × ${xLabel} ${stats.intercept >= 0 ? '+' : ''} ${stats.intercept.toFixed(4)}</p>
+             
+             <h4>Relationship Direction</h4>
+             <p>${stats.pmcc < 0 ? 
+                 As ${xLabel} increases, ${yLabel} tends to decrease (negative correlation). : 
+                 As ${xLabel} increases, ${yLabel} tends to increase (positive correlation).
+             }</p>
+             
+             <h4>Residual Analysis</h4>
+             <p>${stats.residualNormality.interpretation}</p>
+             <p>Skewness: ${stats.residualNormality.skewness.toFixed(4)}, Kurtosis: ${stats.residualNormality.kurtosis.toFixed(4)}</p>
+         </div>
+         
+         ${outlierHtml}
+     ;
+ }
 
-function generateBestFitLine(xValues, slope, intercept) {
-    // Find min and max x values to draw the line across the full width
-    const minX = Math.min(...xValues);
-    const maxX = Math.max(...xValues);
-    
-    // Return points for the line
-    return [
-        { x: minX, y: slope * minX + intercept },
-        { x: maxX, y: slope * maxX + intercept }
-    ];
-}
+ function getCorrelationStrength(pmcc) {
+     const absCorr = Math.abs(pmcc);
+     const direction = pmcc < 0 ? 'negative' : 'positive';
+     
+     if (absCorr >= 0.9) return very strong ${direction};
+     if (absCorr >= 0.7) return strong ${direction};
+     if (absCorr >= 0.5) return moderate ${direction};
+     if (absCorr >= 0.3) return weak ${direction};
+     return very weak ${direction};
+ }
 
-function calculateLineOfBestFit(xValues, yValues) {
-    const xMean = jStat.mean(xValues);
-    const yMean = jStat.mean(yValues);
-    const slope = jStat.covariance(xValues, yValues) / jStat.variance(xValues);
-    const intercept = yMean - slope * xMean;
-    return { slope, intercept };
-}
-
-function getCorrelationStrength(pmcc) {
-    const absCorr = Math.abs(pmcc);
-    const direction = pmcc < 0 ? 'negative' : 'positive';
-    
-    if (absCorr >= 0.9) return `very strong ${direction}`;
-    if (absCorr >= 0.7) return `strong ${direction}`;
-    if (absCorr >= 0.5) return `moderate ${direction}`;
-    if (absCorr >= 0.3) return `weak ${direction}`;
-    return `very weak ${direction}`;
-}
-
-function displayAdvancedInterpretation(variable1, variable2, stats, pValue, isSignificant) {
-    const spielElement = $('spiel');
-    const roundedPValue = pValue.toFixed(5);
-    const correlationStrength = getCorrelationStrength(stats.pmcc);
-    
-    // Create a more detailed interpretation
-    const interpretation = `
-        <h3>Statistical Analysis Results</h3>
-        <p>The correlation between <strong>${variable1}</strong> and <strong>${variable2}</strong> has a Pearson correlation coefficient (PMCC) of ${stats.pmcc.toFixed(4)}, 
-        indicating a ${correlationStrength} correlation.</p>
-        
-        <p>With a p-value of ${roundedPValue}, this correlation is ${isSignificant ? 'statistically significant' : 'not statistically significant'} 
-        at the 0.05 significance level. The 95% confidence interval for the correlation is [${stats.confidenceInterval.lower.toFixed(4)}, ${stats.confidenceInterval.upper.toFixed(4)}].</p>
-        
-        <h4>Regression Analysis</h4>
-        <p>The regression equation is: ${variable2} = ${stats.slope.toFixed(4)} × ${variable1} ${stats.intercept >= 0 ? '+' : ''} ${stats.intercept.toFixed(4)}</p>
-        <p>R² (coefficient of determination): ${stats.rSquared.toFixed(4)}, indicating that ${(stats.rSquared * 100).toFixed(1)}% of the variance in ${variable2} 
-        can be explained by ${variable1}.</p>
-        <p>Root Mean Square Error (RMSE): ${stats.rmse.toFixed(4)}</p>
-        
-        <h4>Interpretation</h4>
-        <p>${stats.pmcc < 0 ? 
-            `As ${variable1} increases, ${variable2} tends to decrease.` : 
-            `As ${variable1} increases, ${variable2} tends to increase.`
-        }</p>
-        
-        <h4>Residual Analysis</h4>
-        <p>${stats.residualNormality.interpretation}. Skewness: ${stats.residualNormality.skewness.toFixed(4)}, Kurtosis: ${stats.residualNormality.kurtosis.toFixed(4)}</p>
-        ${stats.outliers.length > 0 ? `
-            <h4>Potential Outliers</h4>
-            <p>${stats.outliers.length} potential outlier(s) detected (highlighted in red on the scatter plot). 
-            These points may have a disproportionate influence on the correlation.</p>
-        ` : ''}
-    `;
-    
-    spielElement.innerHTML = interpretation;
-}
+ function displayAdvancedInterpretation(variable1, variable2, stats, pValue, isSignificant) {
+     console.log('Displaying interpretation...');
+     const spielElement = $('spiel');
+     const roundedPValue = pValue.toFixed(5);
+     const correlationStrength = getCorrelationStrength(stats.pmcc);
+     
+     // Create a more detailed interpretation
+     const interpretation = 
+         <h3>Statistical Analysis Results</h3>
+         <p>The correlation between <strong>${variable1}</strong> and <strong>${variable2}</strong> has a Pearson correlation coefficient (PMCC) of ${stats.pmcc.toFixed(4)}, 
+         indicating a ${correlationStrength} correlation.</p>
+         
+         <p>With a p-value of ${roundedPValue}, this correlation is ${isSignificant ? 'statistically significant' : 'not statistically significant'} 
+         at the 0.05 significance level. The 95% confidence interval for the correlation is [${stats.confidenceInterval.lower.toFixed(4)}, ${stats.confidenceInterval.upper.toFixed(4)}].</p>
+         
+         <h4>Regression Analysis</h4>
+         <p>The regression equation is: ${variable2} = ${stats.slope.toFixed(4)} × ${variable1} ${stats.intercept >= 0 ? '+' : ''} ${stats.intercept.toFixed(4)}</p>
+         <p>R² (coefficient of determination): ${stats.rSquared.toFixed(4)}, indicating that ${(stats.rSquared * 100).toFixed(1)}% of the variance in ${variable2} 
+         can be explained by ${variable1}.</p>
+         <p>Root Mean Square Error (RMSE): ${stats.rmse.toFixed(4)}</p>
+         
+         <h4>Interpretation</h4>
+         <p>${stats.pmcc < 0 ? 
+             As ${variable1} increases, ${variable2} tends to decrease. : 
+             As ${variable1} increases, ${variable2} tends to increase.
+         }</p>
+         
+         <h4>Residual Analysis</h4>
+         <p>${stats.residualNormality.interpretation}. Skewness: ${stats.residualNormality.skewness.toFixed(4)}, Kurtosis: ${stats.residualNormality.kurtosis.toFixed(4)}</p>
+         ${stats.outliers.length > 0 ? 
+             <h4>Potential Outliers</h4>
+             <p>${stats.outliers.length} potential outlier(s) detected (highlighted in red on the scatter plot). 
+             These points may have a disproportionate influence on the correlation.</p>
+          : ''}
+     ;
+     
+     spielElement.innerHTML = interpretation;
+ }
 </script>
 </body>
 </html>
