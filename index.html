@@ -5,918 +5,917 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Advanced PMCC and Statistical Analysis Calculator</title>
 <style>
-    :root {
-        --primary-color: #f1623c;
-        --primary-dark: #d94d1a;
-        --text-color: #333;
-        --bg-light: #f9f9f9;
-        --border-color: #e0e0e0;
-        --success-color: #2ecc71;
-        --error-color: #e74c3c;
-        --box-shadow-light: 0 1px 5px rgba(0, 0, 0, 0.05);
-        --box-shadow-medium: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
+:root {
+    --primary-color: #f1623c;
+    --primary-dark: #d94d1a;
+    --text-color: #333;
+    --bg-light: #f9f9f9;
+    --border-color: #e0e0e0;
+    --success-color: #2ecc71;
+    --error-color: #e74c3c;
+    --box-shadow-light: 0 1px 5px rgba(0, 0, 0, 0.05);
+    --box-shadow-medium: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
 
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: var(--primary-color);
-        color: var(--text-color);
-        line-height: 1.6;
-    }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
 
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow-medium);
+}
+
+h1 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-size: 32px;
+}
+
+h3, h4 {
+    color: var(--primary-color);
+}
+
+.card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: var(--box-shadow-light);
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.input-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--bg-light);
+}
+
+.text-center {
+    text-align: center;
+    width: 100%;
+}
+
+.intro-text, .instruction-text {
+    font-size: 18px;
+    color: var(--text-color);
+    margin-bottom: 20px;
+}
+
+.spreadsheet-input {
+    display: block;
+    width: 80%;
+    max-width: 1000px;
+    height: 150px;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: monospace;
+    white-space: pre;
+    overflow: auto;
+    background-color: #fafafa;
+    caret-color: black;
+    outline: none;
+    margin: 0 auto 15px auto;
+    resize: vertical;
+}
+
+.spreadsheet-input::placeholder {
+    color: #888;
+    font-style: italic;
+    line-height: 1.5;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 15px;
+}
+
+button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+button:focus {
+    outline: none;
+}
+
+button:focus-visible {
+    outline: 2px solid var(--primary-dark);
+    outline-offset: 2px;
+}
+
+.results {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.result-label {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.significant {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.not-significant {
+    background-color: var(--error-color);
+    color: white;
+}
+
+.error {
+    color: var(--error-color);
+    font-weight: bold;
+}
+
+.chart-container {
+    display: none;
+    width: 100%;
+    max-width: 800px;
+    margin: 40px auto;
+}
+
+.chart-container canvas {
+    display: block;
+    max-width: 100%;
+}
+
+.spiel {
+    text-align: center;
+    margin: 20px auto;
+    font-size: 16px;
+    color: var(--text-color);
+    max-width: 800px;
+    background-color: var(--bg-light);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow-light);
+}
+
+.statistics-container {
+    display: none;
+    width: 100%;
+    max-width: 800px;
+    margin: 40px auto;
+}
+
+.advanced-stats {
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.stat-box {
+    padding: 10px;
+    background-color: var(--bg-light);
+    border-radius: 5px;
+    box-shadow: var(--box-shadow-light);
+}
+
+.stat-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--primary-color);
+}
+
+.stat-value {
+    font-size: 18px;
+}
+
+.interpretation-section {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--bg-light);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 0 5px 5px 0;
+}
+
+.outlier-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.outlier-table th, .outlier-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.outlier-table th {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+    margin-right: 5px;
+}
+
+.tab.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@media (max-width: 768px) {
     .container {
-        max-width: 1200px;
-        margin: 40px auto;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: var(--box-shadow-medium);
-    }
-
-    h1 {
-        text-align: center;
-        color: var(--primary-color);
-        margin-bottom: 20px;
-        font-size: 32px;
-    }
-
-    h3, h4 {
-        color: var(--primary-color);
-    }
-
-    .card {
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        background-color: #fff;
-        box-shadow: var(--box-shadow-light);
-        padding: 20px;
-        margin-bottom: 30px;
-    }
-
-    .input-section {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: var(--bg-light);
-    }
-
-    .text-center {
-        text-align: center;
-        width: 100%;
-    }
-
-    .intro-text, .instruction-text {
-        font-size: 18px;
-        color: var(--text-color);
-        margin-bottom: 20px;
-    }
-
-    .spreadsheet-input {
-        display: block;
-        width: 80%;
-        max-width: 1000px;
-        height: 150px;
-        border: 1px solid #dcdcdc;
-        border-radius: 4px;
-        padding: 10px;
-        font-family: monospace;
-        white-space: pre;
-        overflow: auto;
-        background-color: #fafafa;
-        caret-color: black;
-        outline: none;
-        margin: 0 auto 15px auto;
-        resize: vertical;
-    }
-
-    .spreadsheet-input::placeholder {
-        color: #888;
-        font-style: italic;
-        line-height: 1.5;
-    }
-
-    .button-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 15px;
-    }
-
-    button {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 4px;
-        background-color: var(--primary-color);
-        color: white;
-        cursor: pointer;
-        font-size: 16px;
-        margin: 5px;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    button:hover {
-        background-color: var(--primary-dark);
-        transform: translateY(-2px);
-    }
-
-    button:focus {
-        outline: none;
-    }
-
-    button:focus-visible {
-        outline: 2px solid var(--primary-dark);
-        outline-offset: 2px;
-    }
-
-    .results {
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    .result-label {
-        font-size: 18px;
-        font-weight: bold;
-        margin-top: 10px;
-        padding: 10px;
-        border-radius: 8px;
-        display: inline-block;
-    }
-
-    .significant {
-        background-color: var(--success-color);
-        color: white;
-    }
-
-    .not-significant {
-        background-color: var(--error-color);
-        color: white;
-    }
-
-    .error {
-        color: var(--error-color);
-        font-weight: bold;
-    }
-
-    .chart-container {
-        display: none;
-        width: 100%;
-        max-width: 800px;
-        margin: 40px auto;
-    }
-
-    .chart-container canvas {
-        display: block;
-        max-width: 100%;
-    }
-
-    .spiel {
-        text-align: center;
-        margin: 20px auto;
-        font-size: 16px;
-        color: var(--text-color);
-        max-width: 800px;
-        background-color: var(--bg-light);
+        margin: 20px 10px;
         padding: 15px;
-        border-radius: 8px;
-        box-shadow: var(--box-shadow-light);
-    }
-
-    .statistics-container {
-        display: none;
-        width: 100%;
-        max-width: 800px;
-        margin: 40px auto;
     }
     
-    .advanced-stats {
-        margin-top: 20px;
-        font-size: 16px;
+    .spreadsheet-input {
+        width: 95%;
     }
     
     .stat-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 15px;
-        margin-top: 15px;
+        grid-template-columns: 1fr;
     }
-    
-    .stat-box {
-        padding: 10px;
-        background-color: var(--bg-light);
-        border-radius: 5px;
-        box-shadow: var(--box-shadow-light);
-    }
-    
-    .stat-label {
-        font-weight: bold;
-        margin-bottom: 5px;
-        color: var(--primary-color);
-    }
-    
-    .stat-value {
-        font-size: 18px;
-    }
-    
-    .interpretation-section {
-        margin-top: 20px;
-        padding: 15px;
-        background-color: var(--bg-light);
-        border-left: 4px solid var(--primary-color);
-        border-radius: 0 5px 5px 0;
-    }
-    
-    .outlier-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-    }
-    
-    .outlier-table th, .outlier-table td {
-        padding: 8px;
-        text-align: left;
-        border-bottom: 1px solid var(--border-color);
-    }
-    
-    .outlier-table th {
-        background-color: var(--primary-color);
-        color: white;
-    }
-
-    .tabs {
-        display: flex;
-        margin-bottom: 20px;
-        border-bottom: 1px solid var(--border-color);
-    }
-    
-    .tab {
-        padding: 10px 20px;
-        cursor: pointer;
-        background-color: #fff;
-        border: 1px solid var(--border-color);
-        border-bottom: none;
-        border-radius: 5px 5px 0 0;
-        margin-right: 5px;
-    }
-    
-    .tab.active {
-        background-color: var(--primary-color);
-        color: white;
-        border-color: var(--primary-color);
-    }
-    
-    .tab-content {
-        display: none;
-    }
-    
-    .tab-content.active {
-        display: block;
-    }
-
-    @media (max-width: 768px) {
-        .container {
-            margin: 20px 10px;
-            padding: 15px;
-        }
-        
-        .spreadsheet-input {
-            width: 95%;
-        }
-        
-        .stat-grid {
-            grid-template-columns: 1fr;
-        }
-    }
+}
 </style>
 </head>
 <body>
 <div class="container">
-    <h1>Advanced PMCC and Statistical Analysis Calculator</h1>
-    <p class="intro-text text-center">
-        Enter two sets of data below to calculate the Pearson Correlation Coefficient, p-value, and other advanced statistics. Visualize the data with scatter plots and regression analysis.
-    </p>
+<h1>Advanced PMCC and Statistical Analysis Calculator</h1>
+<p class="intro-text text-center">
+    Enter two sets of data below to calculate the Pearson Correlation Coefficient, p-value, and other advanced statistics. Visualize the data with scatter plots and regression analysis.
+</p>
 
-    <section class="input-section card">
-        <h3>Input Data</h3>
-        <span class="instruction-text text-center">Paste your data directly from a Google Sheet, including headers in the first row. The headers will be used as axis labels.</span>
-        <textarea id="dataInput" class="spreadsheet-input" placeholder="Paste data here..." rows="6" aria-label="Data input area"></textarea>
-        <div class="button-container">
-            <button id="calculateBtn" type="button">Calculate Statistics</button>
-            <div id="results" class="results" aria-live="polite"></div>
-        </div>
-    </section>
+<section class="input-section card">
+    <h3>Input Data</h3>
+    <span class="instruction-text text-center">Paste your data directly from a Google Sheet, including headers in the first row. The headers will be used as axis labels.</span>
+    <textarea id="dataInput" class="spreadsheet-input" placeholder="Paste data here..." rows="6" aria-label="Data input area"></textarea>
+    <div class="button-container">
+        <button id="calculateBtn" type="button">Calculate Statistics</button>
+        <div id="results" class="results" aria-live="polite"></div>
+    </div>
+</section>
 
-    <section id="analysisContainer" class="chart-container card">
-        <div class="tabs" role="tablist">
-            <div class="tab active" role="tab" id="scatterTabBtn" aria-selected="true" aria-controls="scatterTab" data-tab="scatterTab">Scatter Plot</div>
-            <div class="tab" role="tab" id="residualTabBtn" aria-selected="false" aria-controls="residualTab" data-tab="residualTab">Residual Plot</div>
-            <div class="tab" role="tab" id="statsTabBtn" aria-selected="false" aria-controls="statsTab" data-tab="statsTab">Detailed Statistics</div>
-        </div>
-        
-        <div id="scatterTab" class="tab-content active" role="tabpanel" aria-labelledby="scatterTabBtn">
-            <h3 id="chartTitle" class="text-center">Scatter Plot with Line of Best Fit</h3>
-            <canvas id="scatterChart">
-                <p>Your browser does not support HTML5 canvas.</p>
-            </canvas>
-        </div>
-        
-        <div id="residualTab" class="tab-content" role="tabpanel" aria-labelledby="residualTabBtn">
-            <h3 class="text-center">Residual Plot</h3>
-            <canvas id="residualChart">
-                <p>Your browser does not support HTML5 canvas.</p>
-            </canvas>
-        </div>
-        
-        <div id="statsTab" class="tab-content" role="tabpanel" aria-labelledby="statsTabBtn">
-            <h3 class="text-center">Advanced Statistical Analysis</h3>
-            <div id="advancedStats" class="advanced-stats"></div>
-        </div>
-    </section>
+<section id="analysisContainer" class="chart-container card">
+    <div class="tabs" role="tablist">
+        <div class="tab active" role="tab" id="scatterTabBtn" aria-selected="true" aria-controls="scatterTab" data-tab="scatterTab">Scatter Plot</div>
+        <div class="tab" role="tab" id="residualTabBtn" aria-selected="false" aria-controls="residualTab" data-tab="residualTab">Residual Plot</div>
+        <div class="tab" role="tab" id="statsTabBtn" aria-selected="false" aria-controls="statsTab" data-tab="statsTab">Detailed Statistics</div>
+    </div>
+    
+    <div id="scatterTab" class="tab-content active" role="tabpanel" aria-labelledby="scatterTabBtn">
+        <h3 id="chartTitle" class="text-center">Scatter Plot with Line of Best Fit</h3>
+        <canvas id="scatterChart">
+            <p>Your browser does not support HTML5 canvas.</p>
+        </canvas>
+    </div>
+    
+    <div id="residualTab" class="tab-content" role="tabpanel" aria-labelledby="residualTabBtn">
+        <h3 class="text-center">Residual Plot</h3>
+        <canvas id="residualChart">
+            <p>Your browser does not support HTML5 canvas.</p>
+        </canvas>
+    </div>
+    
+    <div id="statsTab" class="tab-content" role="tabpanel" aria-labelledby="statsTabBtn">
+        <h3 class="text-center">Advanced Statistical Analysis</h3>
+        <div id="advancedStats" class="advanced-stats"></div>
+    </div>
+</section>
 
-    <section id="spiel" class="spiel" aria-live="polite"></section>
+<section id="spiel" class="spiel" aria-live="polite"></section>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jstat/dist/jstat.min.js"></script>
 
 <script>
-    // Helper function for DOM element selection
-    const $ = id => document.getElementById(id);
-    
-    // Debounce function to limit execution frequency
-    function debounce(func, wait) {
-        let timeout;
-        return function(...args) {
-            const context = this;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(context, args), wait);
-        };
-    }
+// Helper function for DOM element selection
+const $ = id => document.getElementById(id);
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const calculateBtn = $('calculateBtn');
-        calculateBtn.addEventListener('click', debounce(calculatePMCC, 300));
-        
-        // Set up tab switching
-        const tabs = document.querySelectorAll('.tab');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs and tab contents
-                document.querySelectorAll('.tab').forEach(t => {
-                    t.classList.remove('active');
-                    t.setAttribute('aria-selected', 'false');
-                });
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                // Add active class to clicked tab and corresponding content
-                tab.classList.add('active');
-                tab.setAttribute('aria-selected', 'true');
-                const tabId = tab.getAttribute('data-tab');
-                $(tabId).classList.add('active');
+// Debounce function to limit execution frequency
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const calculateBtn = $('calculateBtn');
+    calculateBtn.addEventListener('click', debounce(calculatePMCC, 300));
+    
+    // Set up tab switching
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs and tab contents
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
             });
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
+            const tabId = tab.getAttribute('data-tab');
+            $(tabId).classList.add('active');
         });
     });
+});
 
-    function cleanData(input) {
-        // Split input by lines and then by tabs or multiple spaces
-        const rows = input.trim().split('\n').map(row => row.split(/\t|\s{2,}/));
+function cleanData(input) {
+    // Split input by lines and then by tabs or multiple spaces
+    const rows = input.trim().split('\n').map(row => row.split(/\t|\s{2,}/));
 
-        // Extract headers from the first row
-        const headers = rows[0];
+    // Extract headers from the first row
+    const headers = rows[0];
 
-        // Extract data ignoring the first row (headers)
-        const data = rows.slice(1).map(row =>
-            row.map(val => parseFloat(val.replace(/[^\d.-]/g, '')) || NaN)
-        );
+    // Extract data ignoring the first row (headers)
+    const data = rows.slice(1).map(row =>
+        row.map(val => parseFloat(val.replace(/[^\d.-]/g, '')) || NaN)
+    );
 
-        // Separate Metric 1 and Metric 2 while filtering out only invalid numbers
-        const metric1 = [];
-        const metric2 = [];
+    // Separate Metric 1 and Metric 2 while filtering out only invalid numbers
+    const metric1 = [];
+    const metric2 = [];
+    
+    // Only include pairs where both values are valid (but allow negative values)
+    for (let i = 0; i < data.length; i++) {
+        const val1 = data[i][0];
+        const val2 = data[i][1];
         
-        // Only include pairs where both values are valid (but allow negative values)
-        for (let i = 0; i < data.length; i++) {
-            const val1 = data[i][0];
-            const val2 = data[i][1];
-            
-            if (!isNaN(val1) && !isNaN(val2)) {
-                metric1.push(val1);
-                metric2.push(val2);
-            }
-        }
-
-        return { headers, metric1, metric2 };
-    }
-
-    function calculateAdvancedStatistics(xValues, yValues) {
-        const n = xValues.length;
-        
-        // Calculate means
-        const xMean = jStat.mean(xValues);
-        const yMean = jStat.mean(yValues);
-        
-        // Calculate correlation and regression
-        const pmcc = jStat.corrcoeff(xValues, yValues);
-        const { slope, intercept } = calculateLineOfBestFit(xValues, yValues);
-        
-        // Calculate predicted values
-        const predictedValues = xValues.map(x => slope * x + intercept);
-        
-        // Calculate R-squared
-        const rSquared = Math.pow(pmcc, 2);
-        
-        // Calculate MSE and RMSE
-        let sumSquaredErrors = 0;
-        let sumSquaredTotal = 0;
-        
-        for (let i = 0; i < n; i++) {
-            const residual = yValues[i] - predictedValues[i];
-            sumSquaredErrors += Math.pow(residual, 2);
-            sumSquaredTotal += Math.pow(yValues[i] - yMean, 2);
-        }
-        
-        const mse = sumSquaredErrors / n;
-        const rmse = Math.sqrt(mse);
-        
-        // Calculate standard error of the estimate
-        const standardError = Math.sqrt(sumSquaredErrors / (n - 2));
-        
-        // Calculate confidence intervals for correlation (Fisher's z transformation)
-        const z = 0.5 * Math.log((1 + pmcc) / (1 - pmcc));
-        const seZ = 1 / Math.sqrt(n - 3);
-        const z95 = 1.96; // 95% confidence level
-        
-        const lowerZ = z - z95 * seZ;
-        const upperZ = z + z95 * seZ;
-        
-        const lowerR = (Math.exp(2 * lowerZ) - 1) / (Math.exp(2 * lowerZ) + 1);
-        const upperR = (Math.exp(2 * upperZ) - 1) / (Math.exp(2 * upperZ) + 1);
-        
-        // Calculate residuals for analysis
-        const residuals = yValues.map((y, i) => y - predictedValues[i]);
-        
-        // Calculate standardized residuals
-        const standardizedResiduals = residuals.map(r => r / standardError);
-        
-        // Detect potential outliers (standardized residual > 2 or < -2)
-        const outliers = xValues.map((x, i) => ({
-            x: x,
-            y: yValues[i],
-            residual: residuals[i],
-            standardized: standardizedResiduals[i],
-            isOutlier: Math.abs(standardizedResiduals[i]) > 2
-        })).filter(point => point.isOutlier);
-        
-        // Test normality of residuals using skewness and kurtosis
-        const residualNormality = testResidualNormality(residuals);
-        
-        return {
-            pmcc,
-            rSquared,
-            mse,
-            rmse,
-            slope,
-            intercept,
-            standardError,
-            confidenceInterval: {
-                lower: lowerR,
-                upper: upperR
-            },
-            residuals,
-            standardizedResiduals,
-            outliers,
-            residualNormality,
-            predictedValues,
-            n
-        };
-    }
-
-    function testResidualNormality(residuals) {
-        // Simple normality check using skewness and kurtosis
-        const n = residuals.length;
-        const mean = jStat.mean(residuals);
-        const stdDev = jStat.stdev(residuals, true);
-        
-        // Calculate skewness
-        let skewness = 0;
-        for (let i = 0; i < n; i++) {
-            skewness += Math.pow((residuals[i] - mean) / stdDev, 3);
-        }
-        skewness = (n / ((n - 1) * (n - 2))) * skewness;
-        
-        // Calculate kurtosis
-        let kurtosis = 0;
-        for (let i = 0; i < n; i++) {
-            kurtosis += Math.pow((residuals[i] - mean) / stdDev, 4);
-        }
-        kurtosis = ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * kurtosis - (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3));
-        
-        // Check if skewness and kurtosis are within acceptable range for normal distribution
-        const isNormal = Math.abs(skewness) < 1 && Math.abs(kurtosis) < 2;
-        
-        return {
-            isNormal,
-            skewness,
-            kurtosis,
-            interpretation: isNormal ? 
-                "Residuals appear normally distributed" : 
-                "Residuals may not be normally distributed"
-        };
-    }
-
-    function calculatePMCC() {
-        // Clean and parse the values from the text area
-        const { headers, metric1, metric2 } = cleanData($('dataInput').value);
-
-        // Check if both metrics have values
-        if (metric1.length !== metric2.length || metric1.length === 0) {
-            $('results').innerHTML = '<p class="error">Please ensure both metrics have the same number of valid values and are not empty.</p>';
-            $('analysisContainer').style.display = 'none';
-            $('spiel').innerHTML = '';
-            return;
-        }
-
-        try {
-            // Calculate advanced statistics
-            const stats = calculateAdvancedStatistics(metric1, metric2);
-            
-            // Calculate p-value using t-test
-            const n = metric1.length;
-            const tStatistic = stats.pmcc * Math.sqrt((n - 2) / (1 - Math.pow(stats.pmcc, 2)));
-            const pValue = 2 * (1 - jStat.studentt.cdf(Math.abs(tStatistic), n - 2));
-
-            // Determine significance (alpha = 0.05)
-            const isSignificant = pValue < 0.05;
-
-            // Display results with advanced statistics
-            $('results').innerHTML = 
-                <p class="result-label ${isSignificant ? 'significant' : 'not-significant'}">
-                    PMCC: ${stats.pmcc.toFixed(4)} (95% CI: ${stats.confidenceInterval.lower.toFixed(4)} to ${stats.confidenceInterval.upper.toFixed(4)})<br>
-                    P-Value: ${pValue.toFixed(5)} (${isSignificant ? 'Significant' : 'Not Significant'})<br>
-                    R²: ${stats.rSquared.toFixed(4)}<br>
-                    RMSE: ${stats.rmse.toFixed(4)}
-                </p>
-            ;
-
-            // Show the analysis container
-            $('analysisContainer').style.display = 'block';
-
-            // Render scatter plot with line of best fit
-            renderScatterPlot(metric1, metric2, stats, headers[0] || 'X', headers[1] || 'Y');
-
-            // Render residual plot
-            renderResidualPlot(stats.predictedValues, stats.residuals);
-            
-            // Display advanced statistics
-            displayAdvancedStats(stats, headers[0] || 'X', headers[1] || 'Y', pValue, isSignificant);
-
-            // Display the advanced statistical interpretation
-            displayAdvancedInterpretation(headers[0] || 'X', headers[1] || 'Y', stats, pValue, isSignificant);
-            
-        } catch (error) {
-            $('results').innerHTML = <p class="error">Error calculating results: ${error.message}</p>;
-            $('analysisContainer').style.display = 'none';
-            $('spiel').innerHTML = '';
+        if (!isNaN(val1) && !isNaN(val2)) {
+            metric1.push(val1);
+            metric2.push(val2);
         }
     }
 
-    // Helper function to get point style based on outlier status
-    function getPointStyle(point) {
-        return {
-            backgroundColor: point.isOutlier ? '#ff0000' : '#f1623c',
-            pointRadius: point.isOutlier ? 6 : 4,
-            pointHoverRadius: point.isOutlier ? 8 : 6
-        };
+    return { headers, metric1, metric2 };
+}
+
+function calculateAdvancedStatistics(xValues, yValues) {
+    const n = xValues.length;
+    
+    // Calculate means
+    const xMean = jStat.mean(xValues);
+    const yMean = jStat.mean(yValues);
+    
+    // Calculate correlation and regression
+    const pmcc = jStat.corrcoeff(xValues, yValues);
+    const { slope, intercept } = calculateLineOfBestFit(xValues, yValues);
+    
+    // Calculate predicted values
+    const predictedValues = xValues.map(x => slope * x + intercept);
+    
+    // Calculate R-squared
+    const rSquared = Math.pow(pmcc, 2);
+    
+    // Calculate MSE and RMSE
+    let sumSquaredErrors = 0;
+    let sumSquaredTotal = 0;
+    
+    for (let i = 0; i < n; i++) {
+        const residual = yValues[i] - predictedValues[i];
+        sumSquaredErrors += Math.pow(residual, 2);
+        sumSquaredTotal += Math.pow(yValues[i] - yMean, 2);
+    }
+    
+    const mse = sumSquaredErrors / n;
+    const rmse = Math.sqrt(mse);
+    
+    // Calculate standard error of the estimate
+    const standardError = Math.sqrt(sumSquaredErrors / (n - 2));
+    
+    // Calculate confidence intervals for correlation (Fisher's z transformation)
+    const z = 0.5 * Math.log((1 + pmcc) / (1 - pmcc));
+    const seZ = 1 / Math.sqrt(n - 3);
+    const z95 = 1.96; // 95% confidence level
+    
+    const lowerZ = z - z95 * seZ;
+    const upperZ = z + z95 * seZ;
+    
+    const lowerR = (Math.exp(2 * lowerZ) - 1) / (Math.exp(2 * lowerZ) + 1);
+    const upperR = (Math.exp(2 * upperZ) - 1) / (Math.exp(2 * upperZ) + 1);
+    
+    // Calculate residuals for analysis
+    const residuals = yValues.map((y, i) => y - predictedValues[i]);
+    
+    // Calculate standardized residuals
+    const standardizedResiduals = residuals.map(r => r / standardError);
+    
+    // Detect potential outliers (standardized residual > 2 or < -2)
+    const outliers = xValues.map((x, i) => ({
+        x: x,
+        y: yValues[i],
+        residual: residuals[i],
+        standardized: standardizedResiduals[i],
+        isOutlier: Math.abs(standardizedResiduals[i]) > 2
+    })).filter(point => point.isOutlier);
+    
+    // Test normality of residuals using skewness and kurtosis
+    const residualNormality = testResidualNormality(residuals);
+    
+    return {
+        pmcc,
+        rSquared,
+        mse,
+        rmse,
+        slope,
+        intercept,
+        standardError,
+        confidenceInterval: {
+            lower: lowerR,
+            upper: upperR
+        },
+        residuals,
+        standardizedResiduals,
+        outliers,
+        residualNormality,
+        predictedValues,
+        n
+    };
+}
+
+function testResidualNormality(residuals) {
+    // Simple normality check using skewness and kurtosis
+    const n = residuals.length;
+    const mean = jStat.mean(residuals);
+    const stdDev = jStat.stdev(residuals, true);
+    
+    // Calculate skewness
+    let skewness = 0;
+    for (let i = 0; i < n; i++) {
+        skewness += Math.pow((residuals[i] - mean) / stdDev, 3);
+    }
+    skewness = (n / ((n - 1) * (n - 2))) * skewness;
+    
+    // Calculate kurtosis
+    let kurtosis = 0;
+    for (let i = 0; i < n; i++) {
+        kurtosis += Math.pow((residuals[i] - mean) / stdDev, 4);
+    }
+    kurtosis = ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * kurtosis - (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3));
+    
+    // Check if skewness and kurtosis are within acceptable range for normal distribution
+    const isNormal = Math.abs(skewness) < 1 && Math.abs(kurtosis) < 2;
+    
+    return {
+        isNormal,
+        skewness,
+        kurtosis,
+        interpretation: isNormal ? 
+            "Residuals appear normally distributed" : 
+            "Residuals may not be normally distributed"
+    };
+}
+
+function calculatePMCC() {
+    // Clean and parse the values from the text area
+    const { headers, metric1, metric2 } = cleanData($('dataInput').value);
+
+    // Check if both metrics have values
+    if (metric1.length !== metric2.length || metric1.length === 0) {
+        $('results').innerHTML = '<p class="error">Please ensure both metrics have the same number of valid values and are not empty.</p>';
+        $('analysisContainer').style.display = 'none';
+        $('spiel').innerHTML = '';
+        return;
     }
 
-    function renderScatterPlot(xValues, yValues, stats, xAxisLabel, yAxisLabel) {
-        const ctx = $('scatterChart').getContext('2d');
-
-        // Prepare data for scatter plot
-        const scatterData = xValues.map((x, i) => ({ 
-            x, 
-            y: yValues[i],
-            isOutlier: stats.outliers.some(o => o.x === x && o.y === yValues[i])
-        }));
-
-        // Generate datasets with styling
-        const datasets = [
-            {
-                label: 'Data Points',
-                data: scatterData.map(point => ({
-                    x: point.x,
-                    y: point.y
-                })),
-                backgroundColor: scatterData.map(point => getPointStyle(point).backgroundColor),
-                pointRadius: scatterData.map(point => getPointStyle(point).pointRadius),
-                pointHoverRadius: scatterData.map(point => getPointStyle(point).pointHoverRadius)
-            },
-            {
-                type: 'line',
-                label: 'Line of Best Fit',
-                data: generateBestFitLine(xValues, stats.slope, stats.intercept),
-                borderColor: '#d94d1a',
-                borderWidth: 2,
-                fill: false,
-                pointRadius: 0
-            }
-        ];
-
-        // Check if chart instance exists and update it instead of recreating
-        if (window.scatterChartInstance) {
-            window.scatterChartInstance.data.datasets = datasets;
-            window.scatterChartInstance.options.scales.x.title.text = xAxisLabel;
-            window.scatterChartInstance.options.scales.y.title.text = yAxisLabel;
-            window.scatterChartInstance.update();
-        } else {
-            // Create new scatter plot
-            window.scatterChartInstance = new Chart(ctx, {
-                type: 'scatter',
-                data: { datasets },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: xAxisLabel
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: yAxisLabel
-                            }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const point = scatterData[context.dataIndex];
-                                    let label = ${xAxisLabel}: ${context.parsed.x.toFixed(2)}, ${yAxisLabel}: ${context.parsed.y.toFixed(2)};
-                                    if (point && point.isOutlier) {
-                                        label += ' (Potential Outlier)';
-                                    }
-                                    return label;
-                                }
-                            }
-                        },
-                        legend: {
-                            labels: {
-                                generateLabels: function(chart) {
-                                    const labels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-                                    
-                                    // Add a custom label for outliers if they exist
-                                    if (stats.outliers.length > 0) {
-                                        labels.push({
-                                            text: 'Potential Outliers',
-                                            fillStyle: '#ff0000',
-                                            strokeStyle: '#ff0000',
-                                            lineWidth: 0,
-                                            hidden: false
-                                        });
-                                    }
-                                    
-                                    return labels;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    }
-
-    function renderResidualPlot(predictedValues, residuals) {
-        const ctx = $('residualChart').getContext('2d');
+    try {
+        // Calculate advanced statistics
+        const stats = calculateAdvancedStatistics(metric1, metric2);
         
-        const datasets = [{
-            label: 'Residuals',
-            data: predictedValues.map((pred, i) => ({
-                x: pred,
-                y: residuals[i]
+        // Calculate p-value using t-test
+        const n = metric1.length;
+        const tStatistic = stats.pmcc * Math.sqrt((n - 2) / (1 - Math.pow(stats.pmcc, 2)));
+        const pValue = 2 * (1 - jStat.studentt.cdf(Math.abs(tStatistic), n - 2));
+
+        // Determine significance (alpha = 0.05)
+        const isSignificant = pValue < 0.05;
+
+        // Display results with advanced statistics
+        $('results').innerHTML = `
+            <p class="result-label ${isSignificant ? 'significant' : 'not-significant'}">
+                PMCC: ${stats.pmcc.toFixed(4)} (95% CI: ${stats.confidenceInterval.lower.toFixed(4)} to ${stats.confidenceInterval.upper.toFixed(4)})<br>
+                P-Value: ${pValue.toFixed(5)} (${isSignificant ? 'Significant' : 'Not Significant'})<br>
+                R²: ${stats.rSquared.toFixed(4)}<br>
+                RMSE: ${stats.rmse.toFixed(4)}
+            </p>
+        `;
+
+        // Show the analysis container
+        $('analysisContainer').style.display = 'block';
+
+        // Render scatter plot with line of best fit
+        renderScatterPlot(metric1, metric2, stats, headers[0] || 'X', headers[1] || 'Y');
+
+        // Render residual plot
+        renderResidualPlot(stats.predictedValues, stats.residuals);
+        
+        // Display advanced statistics
+        displayAdvancedStats(stats, headers[0] || 'X', headers[1] || 'Y', pValue, isSignificant);
+
+        // Display the advanced statistical interpretation
+        displayAdvancedInterpretation(headers[0] || 'X', headers[1] || 'Y', stats, pValue, isSignificant);
+        
+    } catch (error) {
+        $('results').innerHTML = `<p class="error">Error calculating results: ${error.message}</p>`;
+        $('analysisContainer').style.display = 'none';
+        $('spiel').innerHTML = '';
+    }
+}
+
+// Helper function to get point style based on outlier status
+function getPointStyle(point) {
+    return {
+        backgroundColor: point.isOutlier ? '#ff0000' : '#f1623c',
+        pointRadius: point.isOutlier ? 6 : 4,
+        pointHoverRadius: point.isOutlier ? 8 : 6
+    };
+}
+
+function renderScatterPlot(xValues, yValues, stats, xAxisLabel, yAxisLabel) {
+    const ctx = $('scatterChart').getContext('2d');
+
+    // Prepare data for scatter plot
+    const scatterData = xValues.map((x, i) => ({ 
+        x, 
+        y: yValues[i],
+        isOutlier: stats.outliers.some(o => o.x === x && o.y === yValues[i])
+    }));
+
+    // Generate datasets with styling
+    const datasets = [
+        {
+            label: 'Data Points',
+            data: scatterData.map(point => ({
+                x: point.x,
+                y: point.y
             })),
-            backgroundColor: '#3498db'
-        }];
-        
-        // Check if chart instance exists and update it
-        if (window.residualChartInstance) {
-            window.residualChartInstance.data.datasets = datasets;
-            window.residualChartInstance.update();
-        } else {
-            // Create residual plot
-            window.residualChartInstance = new Chart(ctx, {
-                type: 'scatter',
-                data: { datasets },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Predicted Values'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Residuals'
-                            },
-                            grid: {
-                                color: function(context) {
-                                    if (context.tick.value === 0) {
-                                        return '#666';
-                                    }
-                                    return '#e0e0e0';
-                                },
-                                lineWidth: function(context) {
-                                    if (context.tick.value === 0) {
-                                        return 2;
-                                    }
-                                    return 1;
+            backgroundColor: scatterData.map(point => getPointStyle(point).backgroundColor),
+            pointRadius: scatterData.map(point => getPointStyle(point).pointRadius),
+            pointHoverRadius: scatterData.map(point => getPointStyle(point).pointHoverRadius)
+        },
+        {
+            type: 'line',
+            label: 'Line of Best Fit',
+            data: generateBestFitLine(xValues, stats.slope, stats.intercept),
+            borderColor: '#d94d1a',
+            borderWidth: 2,
+            fill: false,
+            pointRadius: 0
+        }
+    ];
+
+    // Check if chart instance exists and update it instead of recreating
+    if (window.scatterChartInstance) {
+        window.scatterChartInstance.data.datasets = datasets;
+        window.scatterChartInstance.options.scales.x.title.text = xAxisLabel;
+        window.scatterChartInstance.options.scales.y.title.text = yAxisLabel;
+        window.scatterChartInstance.update();
+    } else {
+        // Create new scatter plot
+        window.scatterChartInstance = new Chart(ctx, {
+            type: 'scatter',
+            data: { datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: xAxisLabel
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: yAxisLabel
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const point = scatterData[context.dataIndex];
+                                let label = `${xAxisLabel}: ${context.parsed.x.toFixed(2)}, ${yAxisLabel}: ${context.parsed.y.toFixed(2)}`;
+                                if (point && point.isOutlier) {
+                                    label += ' (Potential Outlier)';
                                 }
+                                return label;
                             }
                         }
                     },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return Predicted: ${context.parsed.x.toFixed(2)}, Residual: ${context.parsed.y.toFixed(2)};
+                    legend: {
+                        labels: {
+                            generateLabels: function(chart) {
+                                const labels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                                
+                                // Add a custom label for outliers if they exist
+                                if (stats.outliers.length > 0) {
+                                    labels.push({
+                                        text: 'Potential Outliers',
+                                        fillStyle: '#ff0000',
+                                        strokeStyle: '#ff0000',
+                                        lineWidth: 0,
+                                        hidden: false
+                                    });
                                 }
+                                
+                                return labels;
                             }
                         }
                     }
                 }
-            });
-        }
+            }
+        });
     }
+}
 
-    function displayAdvancedStats(stats, xLabel, yLabel, pValue, isSignificant) {
-        const statsElement = $('advancedStats');
-        
-        let outlierHtml = '';
-        if (stats.outliers.length > 0) {
-            outlierHtml = 
-                <h4>Potential Outliers</h4>
-                <table class="outlier-table">
-                    <thead>
+function renderResidualPlot(predictedValues, residuals) {
+    const ctx = $('residualChart').getContext('2d');
+    
+    const datasets = [{
+        label: 'Residuals',
+        data: predictedValues.map((pred, i) => ({
+            x: pred,
+            y: residuals[i]
+        })),
+        backgroundColor: '#3498db'
+    }];
+    
+    // Check if chart instance exists and update it
+    if (window.residualChartInstance) {
+        window.residualChartInstance.data.datasets = datasets;
+        window.residualChartInstance.update();
+    } else {
+        // Create residual plot
+        window.residualChartInstance = new Chart(ctx, {
+            type: 'scatter',
+            data: { datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Predicted Values'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Residuals'
+                        },
+                        grid: {
+                            color: function(context) {
+                                if (context.tick.value === 0) {
+                                    return '#666';
+                                }
+                                return '#e0e0e0';
+                            },
+                            lineWidth: function(context) {
+                                if (context.tick.value === 0) {
+                                    return 2;
+                                }
+                                return 1;
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Predicted: ${context.parsed.x.toFixed(2)}, Residual: ${context.parsed.y.toFixed(2)}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+function displayAdvancedStats(stats, xLabel, yLabel, pValue, isSignificant) {
+    const statsElement = $('advancedStats');
+    
+    let outlierHtml = '';
+    if (stats.outliers.length > 0) {
+        outlierHtml = `
+            <h4>Potential Outliers</h4>
+            <table class="outlier-table">
+                <thead>
+                    <tr>
+                        <th>${xLabel}</th>
+                        <th>${yLabel}</th>
+                        <th>Residual</th>
+                        <th>Standardized Residual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${stats.outliers.map(o => `
                         <tr>
-                            <th>${xLabel}</th>
-                            <th>${yLabel}</th>
-                            <th>Residual</th>
-                            <th>Standardized Residual</th>
+                            <td>${o.x.toFixed(2)}</td>
+                            <td>${o.y.toFixed(2)}</td>
+                            <td>${o.residual.toFixed(2)}</td>
+                            <td>${o.standardized.toFixed(2)}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        ${stats.outliers.map(o => 
-                            <tr>
-                                <td>${o.x.toFixed(2)}</td>
-                                <td>${o.y.toFixed(2)}</td>
-                                <td>${o.residual.toFixed(2)}</td>
-                                <td>${o.standardized.toFixed(2)}</td>
-                            </tr>
-                        ).join('')}
-                    </tbody>
-                </table>
-            ;
-        }
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+    
+    statsElement.innerHTML = `
+        <div class="stat-grid">
+            <div class="stat-box">
+                <div class="stat-label">Correlation (PMCC)</div>
+                <div class="stat-value">${stats.pmcc.toFixed(4)}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">P-Value</div>
+                <div class="stat-value">${pValue.toFixed(5)}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">R² (Coefficient of Determination)</div>
+                <div class="stat-value">${stats.rSquared.toFixed(4)}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Sample Size</div>
+                <div class="stat-value">${stats.n}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Slope</div>
+                <div class="stat-value">${stats.slope.toFixed(4)}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Intercept</div>
+                <div class="stat-value">${stats.intercept.toFixed(4)}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Mean Squared Error (MSE)</div>
+                <div class="stat-value">${stats.mse.toFixed(4)}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Root Mean Squared Error (RMSE)</div>
+                <div class="stat-value">${stats.rmse.toFixed(4)}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Standard Error</div>
+                <div class="stat-value">${stats.standardError.toFixed(4)}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">95% CI for Correlation</div>
+                <div class="stat-value">[${stats.confidenceInterval.lower.toFixed(4)}, ${stats.confidenceInterval.upper.toFixed(4)}]</div>
+            </div>
+        </div>
         
-        statsElement.innerHTML = 
-            <div class="stat-grid">
-                <div class="stat-box">
-                    <div class="stat-label">Correlation (PMCC)</div>
-                    <div class="stat-value">${stats.pmcc.toFixed(4)}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">P-Value</div>
-                    <div class="stat-value">${pValue.toFixed(5)}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">R² (Coefficient of Determination)</div>
-                    <div class="stat-value">${stats.rSquared.toFixed(4)}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Sample Size</div>
-                    <div class="stat-value">${stats.n}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Slope</div>
-                    <div class="stat-value">${stats.slope.toFixed(4)}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Intercept</div>
-                    <div class="stat-value">${stats.intercept.toFixed(4)}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Mean Squared Error (MSE)</div>
-                    <div class="stat-value">${stats.mse.toFixed(4)}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Root Mean Squared Error (RMSE)</div>
-                    <div class="stat-value">${stats.rmse.toFixed(4)}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Standard Error</div>
-                    <div class="stat-value">${stats.standardError.toFixed(4)}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">95% CI for Correlation</div>
-                    <div class="stat-value">[${stats.confidenceInterval.lower.toFixed(4)}, ${stats.confidenceInterval.upper.toFixed(4)}
-    <div class="stat-value">[${stats.confidenceInterval.lower.toFixed(4)}, ${stats.confidenceInterval.upper.toFixed(4)}]</div>
-                 </div>
-             </div>
-             
-             <div class="interpretation-section">
-                 <h4>Regression Equation</h4>
-                 <p>${yLabel} = ${stats.slope.toFixed(4)} × ${xLabel} ${stats.intercept >= 0 ? '+' : ''} ${stats.intercept.toFixed(4)}</p>
-                 
-                 <h4>Relationship Direction</h4>
-                 <p>${stats.pmcc < 0 ? 
-                     As ${xLabel} increases, ${yLabel} tends to decrease (negative correlation). : 
-                     As ${xLabel} increases, ${yLabel} tends to increase (positive correlation).
-                 }</p>
-                 
-                 <h4>Residual Analysis</h4>
-                 <p>${stats.residualNormality.interpretation}</p>
-                 <p>Skewness: ${stats.residualNormality.skewness.toFixed(4)}, Kurtosis: ${stats.residualNormality.kurtosis.toFixed(4)}</p>
-             </div>
-             
-             ${outlierHtml}
-         ;
-     }
+        <div class="interpretation-section">
+            <h4>Regression Equation</h4>
+            <p>${yLabel} = ${stats.slope.toFixed(4)} × ${xLabel} ${stats.intercept >= 0 ? '+' : ''} ${stats.intercept.toFixed(  <p>${yLabel} = ${stats.slope.toFixed(4)} × ${xLabel} ${stats.intercept >= 0 ? '+' : ''} ${stats.intercept.toFixed(4)}</p>
+            
+            <h4>Relationship Direction</h4>
+            <p>${stats.pmcc < 0 ? 
+                `As ${xLabel} increases, ${yLabel} tends to decrease (negative correlation).` : 
+                `As ${xLabel} increases, ${yLabel} tends to increase (positive correlation).`
+            }</p>
+            
+            <h4>Residual Analysis</h4>
+            <p>${stats.residualNormality.interpretation}</p>
+            <p>Skewness: ${stats.residualNormality.skewness.toFixed(4)}, Kurtosis: ${stats.residualNormality.kurtosis.toFixed(4)}</p>
+        </div>
+        
+        ${outlierHtml}
+    `;
+}
 
-     function generateBestFitLine(xValues, slope, intercept) {
-         // Find min and max x values to draw the line across the full width
-         const minX = Math.min(...xValues);
-         const maxX = Math.max(...xValues);
-         
-         // Return points for the line
-         return [
-             { x: minX, y: slope * minX + intercept },
-             { x: maxX, y: slope * maxX + intercept }
-         ];
-     }
+function generateBestFitLine(xValues, slope, intercept) {
+    // Find min and max x values to draw the line across the full width
+    const minX = Math.min(...xValues);
+    const maxX = Math.max(...xValues);
+    
+    // Return points for the line
+    return [
+        { x: minX, y: slope * minX + intercept },
+        { x: maxX, y: slope * maxX + intercept }
+    ];
+}
 
-     function calculateLineOfBestFit(xValues, yValues) {
-         const xMean = jStat.mean(xValues);
-         const yMean = jStat.mean(yValues);
-         const slope = jStat.covariance(xValues, yValues) / jStat.variance(xValues);
-         const intercept = yMean - slope * xMean;
-         return { slope, intercept };
-     }
+function calculateLineOfBestFit(xValues, yValues) {
+    const xMean = jStat.mean(xValues);
+    const yMean = jStat.mean(yValues);
+    const slope = jStat.covariance(xValues, yValues) / jStat.variance(xValues);
+    const intercept = yMean - slope * xMean;
+    return { slope, intercept };
+}
 
-     function getCorrelationStrength(pmcc) {
-         const absCorr = Math.abs(pmcc);
-         const direction = pmcc < 0 ? 'negative' : 'positive';
-         
-         if (absCorr >= 0.9) return very strong ${direction};
-         if (absCorr >= 0.7) return strong ${direction};
-         if (absCorr >= 0.5) return moderate ${direction};
-         if (absCorr >= 0.3) return weak ${direction};
-         return very weak ${direction};
-     }
+function getCorrelationStrength(pmcc) {
+    const absCorr = Math.abs(pmcc);
+    const direction = pmcc < 0 ? 'negative' : 'positive';
+    
+    if (absCorr >= 0.9) return `very strong ${direction}`;
+    if (absCorr >= 0.7) return `strong ${direction}`;
+    if (absCorr >= 0.5) return `moderate ${direction}`;
+    if (absCorr >= 0.3) return `weak ${direction}`;
+    return `very weak ${direction}`;
+}
 
-     function displayAdvancedInterpretation(variable1, variable2, stats, pValue, isSignificant) {
-         const spielElement = $('spiel');
-         const roundedPValue = pValue.toFixed(5);
-         const correlationStrength = getCorrelationStrength(stats.pmcc);
-         
-         // Create a more detailed interpretation
-         const interpretation = 
-             <h3>Statistical Analysis Results</h3>
-             <p>The correlation between <strong>${variable1}</strong> and <strong>${variable2}</strong> has a Pearson correlation coefficient (PMCC) of ${stats.pmcc.toFixed(4)}, 
-             indicating a ${correlationStrength} correlation.</p>
-             
-             <p>With a p-value of ${roundedPValue}, this correlation is ${isSignificant ? 'statistically significant' : 'not statistically significant'} 
-             at the 0.05 significance level. The 95% confidence interval for the correlation is [${stats.confidenceInterval.lower.toFixed(4)}, ${stats.confidenceInterval.upper.toFixed(4)}].</p>
-             
-             <h4>Regression Analysis</h4>
-             <p>The regression equation is: ${variable2} = ${stats.slope.toFixed(4)} × ${variable1} ${stats.intercept >= 0 ? '+' : ''} ${stats.intercept.toFixed(4)}</p>
-             <p>R² (coefficient of determination): ${stats.rSquared.toFixed(4)}, indicating that ${(stats.rSquared * 100).toFixed(1)}% of the variance in ${variable2} 
-             can be explained by ${variable1}.</p>
-             <p>Root Mean Square Error (RMSE): ${stats.rmse.toFixed(4)}</p>
-             
-             <h4>Interpretation</h4>
-             <p>${stats.pmcc < 0 ? 
-                 As ${variable1} increases, ${variable2} tends to decrease. : 
-                 As ${variable1} increases, ${variable2} tends to increase.
-             }</p>
-             
-             <h4>Residual Analysis</h4>
-             <p>${stats.residualNormality.interpretation}. Skewness: ${stats.residualNormality.skewness.toFixed(4)}, Kurtosis: ${stats.residualNormality.kurtosis.toFixed(4)}</p>
-             ${stats.outliers.length > 0 ? 
-                 <h4>Potential Outliers</h4>
-                 <p>${stats.outliers.length} potential outlier(s) detected (highlighted in red on the scatter plot). 
-                 These points may have a disproportionate influence on the correlation.</p>
-              : ''}
-         ;
-         
-         spielElement.innerHTML = interpretation;
-     }
- </script>
+function displayAdvancedInterpretation(variable1, variable2, stats, pValue, isSignificant) {
+    const spielElement = $('spiel');
+    const roundedPValue = pValue.toFixed(5);
+    const correlationStrength = getCorrelationStrength(stats.pmcc);
+    
+    // Create a more detailed interpretation
+    const interpretation = `
+        <h3>Statistical Analysis Results</h3>
+        <p>The correlation between <strong>${variable1}</strong> and <strong>${variable2}</strong> has a Pearson correlation coefficient (PMCC) of ${stats.pmcc.toFixed(4)}, 
+        indicating a ${correlationStrength} correlation.</p>
+        
+        <p>With a p-value of ${roundedPValue}, this correlation is ${isSignificant ? 'statistically significant' : 'not statistically significant'} 
+        at the 0.05 significance level. The 95% confidence interval for the correlation is [${stats.confidenceInterval.lower.toFixed(4)}, ${stats.confidenceInterval.upper.toFixed(4)}].</p>
+        
+        <h4>Regression Analysis</h4>
+        <p>The regression equation is: ${variable2} = ${stats.slope.toFixed(4)} × ${variable1} ${stats.intercept >= 0 ? '+' : ''} ${stats.intercept.toFixed(4)}</p>
+        <p>R² (coefficient of determination): ${stats.rSquared.toFixed(4)}, indicating that ${(stats.rSquared * 100).toFixed(1)}% of the variance in ${variable2} 
+        can be explained by ${variable1}.</p>
+        <p>Root Mean Square Error (RMSE): ${stats.rmse.toFixed(4)}</p>
+        
+        <h4>Interpretation</h4>
+        <p>${stats.pmcc < 0 ? 
+            `As ${variable1} increases, ${variable2} tends to decrease.` : 
+            `As ${variable1} increases, ${variable2} tends to increase.`
+        }</p>
+        
+        <h4>Residual Analysis</h4>
+        <p>${stats.residualNormality.interpretation}. Skewness: ${stats.residualNormality.skewness.toFixed(4)}, Kurtosis: ${stats.residualNormality.kurtosis.toFixed(4)}</p>
+        ${stats.outliers.length > 0 ? `
+            <h4>Potential Outliers</h4>
+            <p>${stats.outliers.length} potential outlier(s) detected (highlighted in red on the scatter plot). 
+            These points may have a disproportionate influence on the correlation.</p>
+        ` : ''}
+    `;
+    
+    spielElement.innerHTML = interpretation;
+}
+</script>
 </body>
 </html>
