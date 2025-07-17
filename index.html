@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Advanced PMCC and Statistical Analysis Calculator</title>
+<title>PMCC Calculator</title>
 <style>
 :root {
     --primary-color: #f1623c;
@@ -297,7 +297,7 @@ canvas {
 </head>
 <body>
 <div class="container">
-<h1>Advanced PMCC and Statistical Analysis Calculator</h1>
+<h1>PMCC Calculator</h1>
 <p class="intro-text text-center">
     Enter two sets of data below to calculate the Pearson Correlation Coefficient, p-value, and other advanced statistics. Visualize the data with scatter plots and regression analysis.
 </p>
@@ -544,7 +544,7 @@ function calculatePMCC() {
 
         // Check if both metrics have values
         if (metric1.length !== metric2.length || metric1.length === 0) {
-            $('results').innerHTML = '<p class="error">Please ensure both metrics have the same number of valid values and are not empty.</p>';
+            $('results').innerHTML = <p class="error">Please ensure both metrics have the same number of valid values and are not empty.</p>;
             $('analysisContainer').style.display = 'none';
             $('spiel').innerHTML = '';
             return;
@@ -833,17 +833,17 @@ function displayAdvancedStats(stats, xLabel, yLabel, pValue, isSignificant) {
                 <div class="stat-label">Correlation (PMCC)</div>
                 <div class="stat-value">${stats.pmcc.toFixed(4)}</div>
             </div>
-         <div class="stat-box">
-                 <div class="stat-label">P-Value</div>
-                 <div class="stat-value">${pValue.toFixed(5)}</div>
-             </div>
-             <div class="stat-box">
-                 <div class="stat-label">R² (Coefficient of Determination)</div>
-                 <div class="stat-value">${stats.rSquared.toFixed(4)}</div>
-             </div>
-             <div class="stat-box">
-                 <div class="stat-label">Sample Size</div>
-                 <div class="stat-value">${stats.n}</div>
+            <div class="stat-box">
+                <div class="stat-label">P-Value</div>
+                <div class="stat-value">${pValue.toFixed(5)}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">R² (Coefficient of Determination)</div>
+                <div class="stat-value">${stats.rSquared.toFixed(4)}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Sample Size</div>
+       <div class="stat-value">${stats.n}</div>
              </div>
              <div class="stat-box">
                  <div class="stat-label">Slope</div>
