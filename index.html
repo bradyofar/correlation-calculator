@@ -297,7 +297,7 @@ display: block;
 </head>
 <body>
 <div class="container">
-<h1>PMCC Calculator & Statistics</h1>
+<h1>PMCC Calculator and Statistics</h1>
 <p class="intro-text text-center">
 Enter two sets of data below to calculate the Pearson Correlation Coefficient, p-value, and other advanced statistics. Visualize the data with scatter plots and regression analysis.
 </p>
@@ -883,9 +883,10 @@ statsElement.innerHTML =
          <p>${yLabel} = ${stats.slope.toFixed(4)} × ${xLabel} ${stats.intercept >= 0 ? '+' : ''} ${stats.intercept.toFixed(4)}</p>
          
          <h4>Relationship Direction</h4>
-         <p>${stats.pmcc < 0 ? 
-             `As ${xLabel} increases, ${yLabel} tends to decrease (negative correlation).` : // Fixed string `As ${xLabel} increases, ${yLabel} tends to increase (positive correlation).`
-            }</p>
+<p>${stats.pmcc < 0 ? 
+    `As ${xLabel} increases, ${yLabel} tends to decrease (negative correlation).` : 
+    `As ${xLabel} increases, ${yLabel} tends to increase (positive correlation).`
+   }</p>
             
             <h4>Residual Analysis</h4>
             <p>${stats.residualNormality.interpretation}</p>
